@@ -5,7 +5,7 @@
 part of mapbox_gl;
 
 typedef void MapCreatedCallback(MapboxMapController controller);
-
+/// todo languageEnable
 class MapboxMap extends StatefulWidget {
   const MapboxMap({
     @required this.initialCameraPosition,
@@ -35,17 +35,22 @@ class MapboxMap extends StatefulWidget {
     this.onCameraTrackingChanged,
     this.onCameraIdle,
     this.onMapIdle,
+    /* access modifiers changed from: private */
+    this.enableLogo = false,
+    this.enableAttribution = false,
+    this.languageEnable = false,
+
   }) : assert(initialCameraPosition != null);
 
 
   /// If you want to use Mapbox hosted styles and map tiles, you need to provide a Mapbox access token.
   /// Obtain a free access token on [your Mapbox account page](https://www.mapbox.com/account/access-tokens/).
   /// The reccommended way is to use this parameter to set your access token, an alternative way to add your access tokens through external files is described in the plugin's wiki on Github.
-  /// 
+  ///
   /// Note: You should not use this parameter AND set the access token through external files at the same time, and you should use the same token throughout the entire app.
   final String accessToken;
 
-  /// Please note: you should only add annotations (e.g. symbols or circles) after `onStyleLoadedCallback` has been called. 
+  /// Please note: you should only add annotations (e.g. symbols or circles) after `onStyleLoadedCallback` has been called.
   final MapCreatedCallback onMapCreated;
 
   /// Called when the map style has been successfully loaded and the annotation managers have been enabled.
@@ -148,7 +153,7 @@ class MapboxMap extends StatefulWidget {
 
   /// Called when the map's camera no longer follows the physical device location, e.g. because the user moved the map
   final OnCameraTrackingDismissedCallback onCameraTrackingDismissed;
-  
+
   /// Called when the location tracking mode changes
   final OnCameraTrackingChangedCallback onCameraTrackingChanged;
 
@@ -163,13 +168,17 @@ class MapboxMap extends StatefulWidget {
   /// * All fade/transition animations have completed
   final OnMapIdleCallback onMapIdle;
 
+  final bool enableLogo;
+  final bool enableAttribution;
+  final bool languageEnable;
+
   @override
   State createState() => _MapboxMapState();
 }
 
 class _MapboxMapState extends State<MapboxMap> {
   final Completer<MapboxMapController> _controller =
-      Completer<MapboxMapController>();
+  Completer<MapboxMapController>();
 
   _MapboxMapOptions _mapboxMapOptions;
   final MapboxGlPlatform _mapboxGlPlatform = MapboxGlPlatform.createInstance();
@@ -196,7 +205,7 @@ class _MapboxMapState extends State<MapboxMap> {
     super.didUpdateWidget(oldWidget);
     final _MapboxMapOptions newOptions = _MapboxMapOptions.fromWidget(widget);
     final Map<String, dynamic> updates =
-        _mapboxMapOptions.updatesMap(newOptions);
+    _mapboxMapOptions.updatesMap(newOptions);
     _updateOptions(updates);
     _mapboxMapOptions = newOptions;
   }
@@ -249,6 +258,9 @@ class _MapboxMapOptions {
     this.compassViewPosition,
     this.compassViewMargins,
     this.attributionButtonMargins,
+    this.enableLogo,
+    this.enableAttribution,
+    this.languageEnable,
   });
 
   static _MapboxMapOptions fromWidget(MapboxMap map) {
@@ -269,6 +281,10 @@ class _MapboxMapOptions {
       compassViewPosition: map.compassViewPosition,
       compassViewMargins: map.compassViewMargins,
       attributionButtonMargins: map.attributionButtonMargins,
+
+      enableLogo: map.enableLogo,
+      enableAttribution: map.enableAttribution,
+      languageEnable: map.languageEnable,
     );
   }
 
@@ -304,6 +320,10 @@ class _MapboxMapOptions {
 
   final Point attributionButtonMargins;
 
+  final bool enableLogo;
+  final bool enableAttribution;
+  final bool languageEnable;
+
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> optionsMap = <String, dynamic>{};
 
@@ -338,6 +358,9 @@ class _MapboxMapOptions {
     addIfNonNull('compassViewMargins', pointToArray(compassViewMargins));
     addIfNonNull(
         'attributionButtonMargins', pointToArray(attributionButtonMargins));
+    addIfNonNull('enableLogo', enableLogo);
+    addIfNonNull('enableAttribution', enableAttribution);
+    addIfNonNull('languageEnable', languageEnable);
     return optionsMap;
   }
 
@@ -345,6 +368,6 @@ class _MapboxMapOptions {
     final Map<String, dynamic> prevOptionsMap = toMap();
     return newOptions.toMap()
       ..removeWhere(
-          (String key, dynamic value) => prevOptionsMap[key] == value);
+              (String key, dynamic value) => prevOptionsMap[key] == value);
   }
 }
